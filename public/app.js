@@ -16,6 +16,40 @@
   let clientId = store.get('vg-client');
   if (!clientId) { clientId = rand(16); store.set('vg-client', clientId); }
 
+  // Farbauswahl
+  const PALETTE = [
+    { c: '#41459e', n: 'Lila' },
+    { c: '#56bca6', n: 'Türkis' },
+    { c: '#479dcc', n: 'Blau' },
+    { c: '#c75c48', n: 'Rot' },
+    { c: '#f2c35b', n: 'Gelb' },
+  ];
+  let myColor = store.get('vg-color');
+  if (!PALETTE.some((p) => p.c === myColor)) myColor = PALETTE[0].c;
+
+  // Zeichnet die Farbkreise; "taken" = Farbe des Mitspielers (nicht wählbar)
+  function renderSwatches(el, selected, taken, onPick) {
+    el.innerHTML = '';
+    for (const p of PALETTE) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'swatch';
+      b.style.background = p.c;
+      b.title = p.n + (p.c === taken ? ' (vergeben)' : '');
+      b.setAttribute('aria-label', b.title);
+      b.setAttribute('aria-pressed', String(p.c === selected));
+      b.disabled = p.c === taken;
+      b.addEventListener('click', () => onPick(p.c));
+      el.append(b);
+    }
+  }
+  function swatchPicker(el) {
+    const draw = () => renderSwatches(el, myColor, null, (c) => {
+      myColor = c; store.set('vg-color', c); draw();
+    });
+    draw();
+  }
+
   function show(view) {
     for (const v of document.querySelectorAll('.view')) v.hidden = v.id !== view;
   }
@@ -33,6 +67,7 @@
     show('home');
     const input = $('home-name');
     input.value = store.get('vg-name') || '';
+    swatchPicker($('home-colors'));
     $('home-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const n = input.value.trim();
@@ -75,6 +110,7 @@
   // ---------- Name abfragen ----------
   function initNamePrompt(room) {
     show('name');
+    swatchPicker($('name-colors'));
     $('name-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const n = $('name-input').value.trim();
@@ -154,7 +190,7 @@
       ws.onopen = () => {
         retry = 0;
         $('conn').hidden = true;
-        ws.send(JSON.stringify({ type: 'join', room, clientId, name: myName }));
+        ws.send(JSON.stringify({ type: 'join', room, clientId, name: myName, color: myColor }));
       };
       ws.onmessage = (ev) => {
         const msg = JSON.parse(ev.data);
@@ -192,12 +228,21 @@
       });
       ghosts.forEach((g) => { g.className = 'ghost p' + me; });
 
+      // Farben der Spieler anwenden
+      const root = document.documentElement.style;
+      s.players.forEach((p, i) => root.setProperty('--c' + i, p.color));
+      const mine = s.players[me]?.color;
+      if (mine) { myColor = mine; store.set('vg-color', mine); }
+      renderSwatches($('game-colors'), mine, s.players[opp]?.color, (c) => {
+        if (c !== mine) ws.send(JSON.stringify({ type: 'color', color: c }));
+      });
+
       $('share').hidden = s.players.length >= 2;
 
       // Status-Text
       let text;
       const oppOffline = s.players[opp] && !s.players[opp].connected;
-      if (s.status === 'waiting') text = 'Warte auf Gegner – teile den Link.';
+      if (s.status === 'waiting') text = 'Warte auf Mitspieler – teile den Link.';
       else if (s.status === 'playing') {
         text = s.turn === me ? 'Du bist dran.' : `${pName(opp)} ist dran …`;
         if (oppOffline) text += ` (${pName(opp)} ist offline)`;

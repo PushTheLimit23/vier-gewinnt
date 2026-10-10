@@ -16,10 +16,12 @@
     <!-- Startseite -->
     <section id="home" class="view" hidden>
       <h1>Vier Gewinnt mit Freunden</h1>
-      <p class="muted">Erstell ein Spiel und schick den Link an deinen Gegner.</p>
+      <p class="muted">Erstell ein Spiel und schick den Link an deinen Mitspieler.</p>
       <form id="home-form" class="card">
         <label for="home-name">Dein Name</label>
-        <input id="home-name" maxlength="20" autocomplete="nickname" placeholder="z. B. Marcel" required>
+        <input id="home-name" maxlength="20" autocomplete="nickname" required>
+        <span class="label">Deine Farbe</span>
+        <div class="swatches" id="home-colors"></div>
         <button type="submit">Neues Spiel erstellen</button>
       </form>
       <h2>Deine letzten Spiele</h2>
@@ -33,6 +35,8 @@
       <form id="name-form" class="card">
         <label for="name-input">Dein Name</label>
         <input id="name-input" maxlength="20" autocomplete="nickname" required>
+        <span class="label">Deine Farbe</span>
+        <div class="swatches" id="name-colors"></div>
         <button type="submit">Mitspielen</button>
       </form>
     </section>
@@ -52,7 +56,7 @@
       <p id="status" class="status">Verbinde…</p>
 
       <div id="share" class="card share" hidden>
-        <label for="share-link">Link für deinen Gegner</label>
+        <label for="share-link">Link für deinen Mitspieler</label>
         <div class="row">
           <input id="share-link" readonly>
           <button id="copy" type="button">Kopieren</button>
@@ -63,6 +67,11 @@
       <div class="board-wrap">
         <div id="preview" class="preview"></div>
         <div id="board" class="board"></div>
+      </div>
+
+      <div class="color-row">
+        <span class="muted small">Deine Farbe</span>
+        <div class="swatches small" id="game-colors"></div>
       </div>
 
       <div id="after" class="after" hidden>
