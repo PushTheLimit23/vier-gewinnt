@@ -1,0 +1,13 @@
+{
+  "name": "vier-gewinnt",
+  "version": "1.0.0",
+  "description": "Vier Gewinnt – Online-Multiplayer per Link",
+  "main": "server.js",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

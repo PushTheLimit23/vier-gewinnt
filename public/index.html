@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vier Gewinnt</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="top">
+    <a href="/" class="logo"><span class="d p0"></span><span class="d p1"></span> Vier Gewinnt</a>
+  </header>
+
+  <main>
+    <!-- Startseite -->
+    <section id="home" class="view" hidden>
+      <h1>Vier Gewinnt mit Freunden</h1>
+      <p class="muted">Erstell ein Spiel und schick den Link an deinen Gegner.</p>
+      <form id="home-form" class="card">
+        <label for="home-name">Dein Name</label>
+        <input id="home-name" maxlength="20" autocomplete="nickname" placeholder="z. B. Marcel" required>
+        <button type="submit">Neues Spiel erstellen</button>
+      </form>
+      <h2>Deine letzten Spiele</h2>
+      <ul id="history" class="history"></ul>
+    </section>
+
+    <!-- Name eingeben (wenn per Link eingeladen) -->
+    <section id="name" class="view" hidden>
+      <h1>Du wurdest eingeladen</h1>
+      <p class="muted">Wie sollen dich die anderen sehen?</p>
+      <form id="name-form" class="card">
+        <label for="name-input">Dein Name</label>
+        <input id="name-input" maxlength="20" autocomplete="nickname" required>
+        <button type="submit">Mitspielen</button>
+      </form>
+    </section>
+
+    <!-- Spiel -->
+    <section id="game" class="view" hidden>
+      <div class="scores">
+        <div class="player" id="pl0">
+          <span class="d p0"></span><span class="pname" id="p0-name">…</span><span class="pscore" id="p0-score">0</span>
+        </div>
+        <div class="vs">:</div>
+        <div class="player right" id="pl1">
+          <span class="pscore" id="p1-score">0</span><span class="pname" id="p1-name">…</span><span class="d p1"></span>
+        </div>
+      </div>
+
+      <p id="status" class="status">Verbinde…</p>
+
+      <div id="share" class="card share" hidden>
+        <label for="share-link">Link für deinen Gegner</label>
+        <div class="row">
+          <input id="share-link" readonly>
+          <button id="copy" type="button">Kopieren</button>
+        </div>
+        <button id="native-share" type="button" class="secondary" hidden>Teilen …</button>
+      </div>
+
+      <div class="board-wrap">
+        <div id="preview" class="preview"></div>
+        <div id="board" class="board"></div>
+      </div>
+
+      <div id="after" class="after" hidden>
+        <button id="rematch" type="button">Revanche</button>
+        <p id="rematch-note" class="muted small"></p>
+      </div>
+
+      <p id="conn" class="conn" hidden>Verbindung unterbrochen – verbinde neu …</p>
+    </section>
+
+    <!-- Fehler -->
+    <section id="error" class="view" hidden>
+      <h1>Hoppla</h1>
+      <p id="error-msg"></p>
+      <a class="button" href="/">Zur Startseite</a>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
