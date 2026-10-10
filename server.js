@@ -153,7 +153,7 @@ function broadcast(room) {
       type: 'state',
       room: room.id,
       you: seat,
-      players: room.players.map((x) => ({ name: x.name, connected: x.connected })),
+      players: room.players.map((x) => ({ name: x.name, connected: x.connected, color: x.color })),
       board: room.board,
       turn: room.turn,
       status: room.status,
@@ -167,6 +167,16 @@ function broadcast(room) {
       rematch: [...room.rematch],
     });
   });
+}
+
+// Erlaubte Steinfarben (aus der Farbpalette)
+const COLORS = ['#41459e', '#56bca6', '#479dcc', '#c75c48', '#f2c35b'];
+
+// Gewünschte Farbe vergeben – oder die erste freie, falls sie schon belegt ist
+function pickColor(room, seat, wanted) {
+  const other = room.players[1 - seat]?.color;
+  if (COLORS.includes(wanted) && wanted !== other) return wanted;
+  return COLORS.find((c) => c !== other);
 }
 
 const cleanName = (n) =>
@@ -198,6 +208,7 @@ wss.on('connection', (ws) => {
         }
         room.players.push({ id: clientId, name: cleanName(msg.name), ws, connected: true });
         seat = room.players.length - 1;
+        room.players[seat].color = pickColor(room, seat, msg.color);
         if (room.players.length === 2 && room.status === 'waiting') room.status = 'playing';
       } else {
         // Wiederverbindung (z. B. Seite neu geladen)
@@ -245,6 +256,15 @@ wss.on('connection', (ws) => {
         room.turn = 1 - room.turn;
       }
       return broadcast(room);
+    }
+
+    if (msg.type === 'color') {
+      const other = room.players[1 - ws.seat]?.color;
+      if (COLORS.includes(msg.color) && msg.color !== other) {
+        room.players[ws.seat].color = msg.color;
+        broadcast(room);
+      }
+      return;
     }
 
     if (msg.type === 'rematch') {
